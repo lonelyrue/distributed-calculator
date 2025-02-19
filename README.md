@@ -69,10 +69,11 @@ curl --location 'localhost:8080/api/v1/expressions/1'
 
 
 ## схема работы
-
+```
 Пользователь -> Оркестратор -> Агенты -> Оркестратор -> Пользователь
-
+```
 Структура проекта:
+```
 distributed-calculator/
 ├── cmd/
 │   ├── orchestrator/
@@ -100,7 +101,7 @@ distributed-calculator/
 ├── go.sum
 └── tests/
     ├── postman_collection.json
-    └── curl_examples.txt
+    └── curl_examples.txt ```
 
 Описание структуры:
 
