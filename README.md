@@ -101,8 +101,10 @@ distributed-calculator/
 ├── go.sum
 └── tests/
     ├── postman_collection.json
-    └── curl_examples.txt ```
+    └── curl_examples.txt 
+```
 
+---
 Описание структуры:
 
 1. `cmd/`:
