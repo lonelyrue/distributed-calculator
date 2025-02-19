@@ -1,0 +1,23 @@
+# Добавление выражения
+curl --location 'http://localhost:8080/api/v1/calculate' \
+--header 'Content-Type: application/json' \
+--data '{
+  "expression": "2+2*2"
+}'
+
+# Получение списка выражений
+curl --location 'http://localhost:8080/api/v1/expressions'
+
+# Получение выражения по ID
+curl --location 'http://localhost:8080/api/v1/expressions/1'
+
+# Получение задачи для выполнения
+curl --location 'http://localhost:8080/internal/task'
+
+# Отправка результата задачи
+curl --location 'http://localhost:8080/internal/task' \
+--header 'Content-Type: application/json' \
+--data '{
+  "id": "1",
+  "result": 6
+}'

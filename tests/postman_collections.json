@@ -1,0 +1,102 @@
+{
+    "info": {
+      "_postman_id": "your-postman-id",
+      "name": "Distributed Calculator API",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Add Expression",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"expression\": \"2+2*2\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:8080/api/v1/calculate",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8080",
+            "path": ["api", "v1", "calculate"]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Get Expressions",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:8080/api/v1/expressions",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8080",
+            "path": ["api", "v1", "expressions"]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Get Expression by ID",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:8080/api/v1/expressions/1",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8080",
+            "path": ["api", "v1", "expressions", "1"]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Get Task",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:8080/internal/task",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8080",
+            "path": ["internal", "task"]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Send Task Result",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"id\": \"1\",\n  \"result\": 6\n}"
+          },
+          "url": {
+            "raw": "http://localhost:8080/internal/task",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "8080",
+            "path": ["internal", "task"]
+          }
+        },
+        "response": []
+      }
+    ]
+  }
