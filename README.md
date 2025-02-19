@@ -70,7 +70,6 @@ curl --location 'localhost:8080/api/v1/expressions/1'
 
 ## схема работы
 
-```plaintext
 Пользователь -> Оркестратор -> Агенты -> Оркестратор -> Пользователь
 
 Структура проекта:
@@ -101,9 +100,9 @@ distributed-calculator/
 ├── go.sum
 └── tests/
     ├── postman_collection.json
-    └── curl_examples.txt ```
- 
-## Описание структуры:
+    └── curl_examples.txt
+
+Описание структуры:
 
 1. `cmd/`:
    - orchestrator/main.go — вход для оркестратора
