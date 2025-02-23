@@ -22,11 +22,12 @@
 2. Теперь клонируйте репозиторий:
   
    git clone https://github.com/yourusername/distributed-calculator.git
-   cd distributed-calculator
-   
-3. И запустите проект с помощью докера:
-  
+3. Запустите проект с помощью докера:
    docker-compose up --build
+4. Пишем в терминале следующие команды, чтобы запустить сам проект (на порте :8080):
+   cd distributed-calculator
+   go mod init distributed-calculator
+   go run ./distributed-calculator/cmd/orchestrator/main.go
 ## Примеры запросов
 
 ### Добавление выражения
