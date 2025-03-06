@@ -1,73 +1,70 @@
+
 package expression
 
 import (
-    "distributed-calculator/pkg/task"
     "errors"
+    "distributed-calculator/pkg/task"
     "strconv"
     "strings"
+    "unicode"
+    "github.com/google/uuid"
+    "fmt"
 )
 
 // ParseExpression разбирает выражение на задачи
 func ParseExpression(expr string) ([]task.Task, error) {
-    // Удаляем пробелы
     expr = strings.ReplaceAll(expr, " ", "")
-
-    // Разбираем выражение на токены
     tokens := tokenize(expr)
-
-    // Преобразуем токены в обратную польскую запись (RPN)
-    rpn, err := shuntingYard(tokens)
+    rpn, err := toRPN(tokens)
     if err != nil {
         return nil, err
     }
-
-    // Строим задачи из RPN
-    tasks, err := buildTasks(rpn)
-    if err != nil {
-        return nil, err
-    }
-
-    return tasks, nil
+    return buildTasks(rpn)
 }
 
 // tokenize разбивает выражение на токены
-func tokenize(expr string) []string {
+func tokenize(expression string) []string {
     var tokens []string
-    var buffer strings.Builder
+    var current string
 
-    for _, char := range expr {
-        if isOperator(string(char)) || char == '(' || char == ')' {
-            if buffer.Len() > 0 {
-                tokens = append(tokens, buffer.String())
-                buffer.Reset()
+    for _, r := range expression {
+        if unicode.IsSpace(r) {
+            continue
+        }
+        if isOperator(r) || r == '(' || r == ')' {
+            if current != "" {
+                tokens = append(tokens, current)
+                current = ""
             }
-            tokens = append(tokens, string(char))
+            tokens = append(tokens, string(r))
+        } else if unicode.IsDigit(r) || r == '.' {
+            current += string(r)
         } else {
-            buffer.WriteRune(char)
-		}
+            return nil // некорректный символ
+        }
     }
-
-    if buffer.Len() > 0 {
-        tokens = append(tokens, buffer.String())
+    if current != "" {
+        tokens = append(tokens, current)
     }
-
     return tokens
 }
 
-// shuntingYard преобразует токены в обратную польскую запись
-func shuntingYard(tokens []string) ([]string, error) {
+// toRPN преобразует токены в обратную польскую запись (RPN)
+func toRPN(tokens []string) ([]string, error) {
     var output []string
     var stack []string
+
+    precedence := map[string]int{
+        "+": 1,
+        "-": 1,
+        "*": 2,
+        "/": 2,
+        "(": 0,
+    }
 
     for _, token := range tokens {
         if isNumber(token) {
             output = append(output, token)
-        } else if isOperator(token) {
-            for len(stack) > 0 && isOperator(stack[len(stack)-1]) && precedence(stack[len(stack)-1]) >= precedence(token) {
-                output = append(output, stack[len(stack)-1])
-                stack = stack[:len(stack)-1]
-            }
-            stack = append(stack, token)
         } else if token == "(" {
             stack = append(stack, token)
         } else if token == ")" {
@@ -78,14 +75,19 @@ func shuntingYard(tokens []string) ([]string, error) {
             if len(stack) == 0 {
                 return nil, errors.New("mismatched parentheses")
             }
-            stack = stack[:len(stack)-1]
+            stack = stack[:len(stack)-1] // Убираем '('
+        } else if isOperator(rune(token[0])) {
+            for len(stack) > 0 && precedence[stack[len(stack)-1]] >= precedence[token] {
+                output = append(output, stack[len(stack)-1])
+                stack = stack[:len(stack)-1]
+            }
+            stack = append(stack, token)
+        } else {
+            return nil, fmt.Errorf("unexpected token: %s", token)
         }
     }
 
     for len(stack) > 0 {
-        if stack[len(stack)-1] == "(" || stack[len(stack)-1] == ")" {
-            return nil, errors.New("mismatched parentheses")
-        }
         output = append(output, stack[len(stack)-1])
         stack = stack[:len(stack)-1]
     }
@@ -101,7 +103,7 @@ func buildTasks(rpn []string) ([]task.Task, error) {
     for _, token := range rpn {
         if isNumber(token) {
             stack = append(stack, token)
-        } else if isOperator(token) {
+        } else if isOperator(rune(token[0])) {
             if len(stack) < 2 {
                 return nil, errors.New("invalid expression")
             }
@@ -113,8 +115,8 @@ func buildTasks(rpn []string) ([]task.Task, error) {
             taskID := generateID()
             task := task.Task{
                 ID:             taskID,
-                Arg1:           parseNumber(arg1),
-                Arg2:           parseNumber(arg2),
+                Arg1:           arg1,
+                Arg2:           arg2,
                 Operation:      token,
                 OperationTime:  getOperationTime(token),
                 Status:         "pending",
@@ -128,47 +130,30 @@ func buildTasks(rpn []string) ([]task.Task, error) {
     return tasks, nil
 }
 
-// Вспомогательные функции
+// isNumber проверяет, является ли токен числом
 func isNumber(token string) bool {
     _, err := strconv.ParseFloat(token, 64)
     return err == nil
 }
 
-func isOperator(token string) bool {
-    return token == "+" || token == "-" || token == "*" || token == "/"
+// isOperator проверяет, является ли символ оператором
+func isOperator(r rune) bool {
+    return r == '+' || r == '-' || r == '*' || r == '/'
 }
 
-func precedence(op string) int {
-    switch op {
-    case "+", "-":
-        return 1
-    case "*", "/":
-        return 2
-    default:
-        return 0
-    }
+// generateID генерирует уникальный идентификатор
+func generateID() string {
+    return uuid.NewString()
 }
 
-func parseNumber(token string) float64 {
-    num, _ := strconv.ParseFloat(token, 64)
-    return num
-}
-
+// getOperationTime возвращает время выполнения операции
 func getOperationTime(op string) int {
     switch op {
-    case "+":
+    case "+", "-":
         return 1000
-    case "-":
-        return 1000
-    case "*":
+    case "*", "/":
         return 2000
-    case "/":
-        return 3000
     default:
         return 0
     }
-}
-
-func generateID() string {
-    return strconv.Itoa(int(time.Now().UnixNano()))
 }
