@@ -21,7 +21,7 @@
 1. Необходимо установить Docker и Docker Compose.
 2. Теперь клонируйте репозиторий:
   
-   git clone https://github.com/yourusername/distributed-calculator.git
+   git clone https://github.com/lonelyrue/distributed-calculator.git
 3. Запустите проект с помощью докера:
    docker-compose up --build
 4. Пишем в терминале следующие команды, чтобы запустить сам проект (на порте :8080):
